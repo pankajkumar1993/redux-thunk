@@ -1,10 +1,30 @@
 import axios from "axios";
-import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER, DELETE_USER_ERROR, DELETE_USER_SUCCESS, EDIT_USER, EDIT_USER_ERROR, EDIT_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "../store/users/userActions";
+import {
+    ADD_USER,
+    ADD_USER_ERROR,
+    ADD_USER_SUCCESS,
+    DELETE_USER,
+    DELETE_USER_ERROR,
+    DELETE_USER_SUCCESS,
+    EDIT_USER,
+    EDIT_USER_ERROR,
+    EDIT_USER_SUCCESS,
+    FETCH_USER,
+    FETCH_USER_ERROR,
+    FETCH_USERS, FETCH_USERS_ERROR,
+    FETCH_USERS_SUCCESS,
+} from "../store/users/userActions";
 import { Dispatch } from "redux";
 import { User, UserActionTypes } from "../store/users/types";
+import { RootState } from "../store/rootReducer";
 
-// ************************ Fetch Action ************************
-export const fetchUsers = () => async (dispatch: Dispatch<UserActionTypes>) => {
+// ************************ Thunk Fetch Action Creator ************************
+export const fetchUsers = () => async (dispatch: Dispatch<UserActionTypes>, getState: () => RootState) => {
+    let a = getState().todos
+    let b = getState().users
+    console.log(a.todos[0]);
+    console.log(b.users[0]);
+
     dispatch({ type: FETCH_USERS });
 
     try {
@@ -28,7 +48,7 @@ export const fetchUsers = () => async (dispatch: Dispatch<UserActionTypes>) => {
     }
 };
 
-// ************************ Add Action ************************
+// ************************ Thunk Add Action Creator ************************
 export const addUser = (newUser: User) => async (dispatch: Dispatch<UserActionTypes>) => {
     dispatch({ type: ADD_USER });
 
@@ -53,7 +73,7 @@ export const addUser = (newUser: User) => async (dispatch: Dispatch<UserActionTy
     }
 };
 
-// ************************ Delete Action ************************
+// ************************ Thunk Delete Action Creator ************************
 export const deleteUser = (id: number) => async (dispatch: Dispatch<UserActionTypes>) => {
     dispatch({ type: DELETE_USER });
 
@@ -78,7 +98,7 @@ export const deleteUser = (id: number) => async (dispatch: Dispatch<UserActionTy
     }
 };
 
-// ************************ Edit Action ************************
+// ************************ Thunk Edit Action Creator ************************
 export const editUser = (user: User) => async (dispatch: Dispatch<UserActionTypes>) => {
     dispatch({ type: EDIT_USER });
 
@@ -97,6 +117,31 @@ export const editUser = (user: User) => async (dispatch: Dispatch<UserActionType
         } else {
             dispatch({
                 type: EDIT_USER_ERROR,
+                payload: 'An unknown error occurred.',
+            });
+        }
+    }
+};
+
+// ************************ Thunk Get Single Item Action Creator ************************
+export const getUser = (userId: number) => async (dispatch: Dispatch<UserActionTypes>) => {
+    dispatch({ type: FETCH_USERS });
+
+    try {
+        const response = await axios.get(`https://dummyjson.com/users/${userId}`);
+        dispatch({
+            type: FETCH_USER,
+            payload: response.data,
+        });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            dispatch({
+                type: FETCH_USER_ERROR,
+                payload: error.message,
+            });
+        } else {
+            dispatch({
+                type: FETCH_USER_ERROR,
                 payload: 'An unknown error occurred.',
             });
         }

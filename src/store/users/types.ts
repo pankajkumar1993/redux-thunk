@@ -1,4 +1,19 @@
-import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER, DELETE_USER_ERROR, DELETE_USER_SUCCESS, EDIT_USER, EDIT_USER_ERROR, EDIT_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "./userActions";
+import {
+    ADD_USER,
+    ADD_USER_ERROR,
+    ADD_USER_SUCCESS,
+    DELETE_USER,
+    DELETE_USER_ERROR,
+    DELETE_USER_SUCCESS,
+    EDIT_USER, EDIT_USER_ERROR,
+    EDIT_USER_SUCCESS,
+    FETCH_USER,
+    FETCH_USER_ERROR,
+    FETCH_USER_SUCCESS,
+    FETCH_USERS,
+    FETCH_USERS_ERROR,
+    FETCH_USERS_SUCCESS
+} from "./userActions";
 
 // ************************* User Types *************************
 export interface User {
@@ -74,6 +89,23 @@ interface EditUserErrorAction {
     payload: string;
 }
 
+
+
+// --------- Edit User Action Type ---------
+interface FetchUserAction {
+    type: typeof FETCH_USER;
+}
+
+interface FetchUserSuccessAction {
+    type: typeof FETCH_USER_SUCCESS;
+    payload: User;
+}
+
+interface FetchUserErrorAction {
+    type: typeof FETCH_USER_ERROR;
+    payload: string;
+}
+
 export type UserActionTypes =
     | FetchUsersAction
     | FetchUsersSuccessAction
@@ -86,4 +118,7 @@ export type UserActionTypes =
     | DeleteUserErrorAction
     | EditUserAction
     | EditUserSuccessAction
-    | EditUserErrorAction;
+    | EditUserErrorAction
+    | FetchUserAction
+    | FetchUserSuccessAction
+    | FetchUserErrorAction;

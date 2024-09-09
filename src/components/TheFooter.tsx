@@ -13,10 +13,10 @@ const TheFooter: React.FC = () => {
         {/* Footer Links */}
         <nav className="flex space-x-4 mb-4 md:mb-0">
           <Link to="/" className="hover:text-gray-400">
-            Home
-          </Link>
-          <Link to="/users" className="hover:text-gray-400">
             Users
+          </Link>
+          <Link to="/todos" className="hover:text-gray-400">
+            Todos
           </Link>
         </nav>
       </div>

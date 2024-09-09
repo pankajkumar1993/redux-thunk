@@ -882,3 +882,160 @@ By following the principles outlined in this guide and applying them to your Red
 3. Thunk Action Creators for CRUD Operations.
 4. Reducer to Handle User State.
 5. Dispatch Thunk Actions in the Component.
+
+
+
+
+# What is a "thunk"?
+The word "thunk" is a programming term that means "a piece of code that does some delayed work". Rather than execute some logic now, we can write a function body or code that can be used to perform the work later.
+
+For Redux specifically, "thunks" are a pattern of writing functions with logic inside that can interact with a Redux store's dispatch and getState methods.
+
+Using thunks requires the redux-thunk middleware to be added to the Redux store as part of its configuration.
+
+Thunks are a standard approach for writing async logic in Redux apps, and are commonly used for data fetching. However, they can be used for a variety of tasks, and can contain both synchronous and asynchronous logic.
+
+# Writing Thunks
+A thunk function is a function that accepts two arguments: the Redux store dispatch method, and the Redux store getState method. Thunk functions are not directly called by application code. Instead, they are passed to store.dispatch():
+
+const thunkFunction = (dispatch, getState) => {
+  // logic here that can dispatch actions or read state
+}
+
+store.dispatch(thunkFunction)
+
+
+A thunk function may contain any arbitrary logic, sync or async, and can call dispatch or getState at any time.
+
+In the same way that Redux code normally uses action creators to generate action objects for dispatching instead of writing action objects by hand, we normally use thunk action creators to generate the thunk functions that are dispatched. A thunk action creator is a function that may have some arguments, and returns a new thunk function. The thunk typically closes over any arguments passed to the action creator, so they can be used in the logic:
+
+<script>
+// fetchTodoById is the "thunk action creator"
+export function fetchTodoById(todoId) {
+  // fetchTodoByIdThunk is the "thunk function"
+  return async function fetchTodoByIdThunk(dispatch, getState) {
+    const response = await client.get(`/fakeApi/todo/${todoId}`)
+    dispatch(todosLoaded(response.todos))
+  }
+}
+</script>
+
+
+Thunk functions and action creators can be written using either the function keyword or arrow functions - there's no meaningful difference here. The same fetchTodoById thunk could also be written using arrow functions, like this:
+
+<script>
+export const fetchTodoById = todoId => async dispatch => {
+  const response = await client.get(`/fakeApi/todo/${todoId}`)
+  dispatch(todosLoaded(response.todos))
+}
+</script>
+
+
+In either case, the thunk is dispatched by calling the action creator, in the same way as you'd dispatch any other Redux action:
+
+<script>
+function TodoComponent({ todoId }) {
+  const dispatch = useDispatch()
+
+  const onFetchClicked = () => {
+    // Calls the thunk action creator, and passes the thunk function to dispatch
+    dispatch(fetchTodoById(todoId))
+  }
+}
+</script>
+
+
+
+# Why Use Thunks?
+Thunks allow us to write additional Redux-related logic separate from a UI layer. This logic can include side effects, such as async requests or generating random values, as well as logic that requires dispatching multiple actions or access to the Redux store state.
+
+Redux reducers must not contain side effects, but real applications require logic that has side effects. Some of that may live inside components, but some may need to live outside the UI layer. Thunks (and other Redux middleware) give us a place to put those side effects.
+
+It's common to have logic directly in components, such as making an async request in a click handler or a useEffect hook and then processing the results. However, it's often necessary to move as much of that logic as possible outside the UI layer. This may be done to improve testability of the logic, to keep the UI layer as thin and "presentational" as possible, or to improve code reuse and sharing.
+
+In a sense, a thunk is a loophole where you can write any code that needs to interact with the Redux store, ahead of time, without needing to know which Redux store will be used. This keeps the logic from being bound to any specific Redux store instance and keeps it reusable.
+
+# Detailed Explanation: Thunks, Connect, and "Container Components"
+Historically, another reason to use thunks was to help keep React components "unaware of Redux". The connect API allowed passing action creators and "binding" them to automatically dispatch actions when called. Since components typically did not have access to dispatch internally, passing thunks to connect made it possible for components to just call this.props.doSomething(), without needing to know if it was a callback from a parent, dispatching a plain Redux action, dispatching a thunk performing sync or async logic, or a mock function in a test.
+
+With the arrival of the React-Redux hooks API, that situation has changed. The community has switched away from the "container/presentational" pattern in general, and components now have access to dispatch directly via the useDispatch hook. This does mean that it's possible to have more logic directly inside of a component, such as an async fetch + dispatch of the results. However, thunks have access to getState, which components do not, and there's still value in moving that logic outside of components.
+
+# Thunk Use Cases
+
+Because thunks are a general-purpose tool that can contain arbitrary logic, they can be used for a wide variety of purposes. The most common use cases are:
+
+1. Moving complex logic out of components
+2. Making async requests or other async logic
+3. Writing logic that needs to dispatch multiple actions in a row or over time
+4. Writing logic that needs access to getState to make decisions or include other state values in an action
+5. Thunks are "one-shot" functions, with no sense of a lifecycle. They also cannot see other dispatched actions. So, they should not generally be used for initializing persistent connections like websockets, and you can't use them to respond to other actions.
+
+Thunks are best used for complex synchronous logic, and simple to moderate async logic such as making a standard AJAX request and dispatching actions based on the request results.
+
+
+# Redux Thunk Middleware
+
+Dispatching thunk functions requires that the redux-thunk middleware has been added to the Redux store as part of its configuration.
+
+# Adding the Middleware
+The Redux Toolkit configureStore API automatically adds the thunk middleware during store creation, so it should typically be available with no extra configuration needed.
+
+If you need to add the thunk middleware to a store manually, that can be done by passing the thunk middleware to applyMiddleware() as part of the setup process.
+
+
+# How Does the Middleware Work?
+To start, let's review how Redux middleware work in general.
+
+Redux middleware are all written as a series of 3 nested functions:
+
+The outer function receives a "store API" object with {dispatch, getState}
+The middle function receives the next middleware in the chain (or the actual store.dispatch method)
+The inner function will be called with each action as it's passed through the middleware chain
+It's important to note that middleware can be used to allow passing values that are not action objects into store.dispatch(), as long as the middleware intercepts those values and does not let them reach the reducers.
+
+With that in mind, we can look at the specifics of the thunk middleware.
+
+The actual implementation of the thunk middleware is very short - only about 10 lines. Here's the source, with additional added comments:
+
+
+Redux thunk middleware implementation, annotated
+<script>
+// standard middleware definition, with 3 nested functions:
+// 1) Accepts `{dispatch, getState}`
+// 2) Accepts `next`
+// 3) Accepts `action`
+const thunkMiddleware =
+  ({ dispatch, getState }) =>
+  next =>
+  action => {
+    // If the "action" is actually a function instead...
+    if (typeof action === 'function') {
+      // then call the function and pass `dispatch` and `getState` as arguments
+      return action(dispatch, getState)
+    }
+
+    // Otherwise, it's a normal action - send it onwards
+    return next(action)
+  }
+</script>
+
+
+In other words:
+
+If you pass a function into dispatch, the thunk middleware sees that it's a function instead of an action object, intercepts it, and calls that function with (dispatch, getState) as its arguments
+If it's a normal action object (or anything else), it's forwarded to the next middleware in the chain
+
+
+
+# Folder Structure for Redux Store
+store/             
+  user/
+    actions.ts
+    reducer.ts
+    types.ts  (All types defined and used in this user store module)
+  todo/
+    actions.ts
+    reducer.ts
+    types.ts
+utils/
+  api.ts

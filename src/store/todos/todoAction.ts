@@ -1,17 +1,18 @@
+
 import {
   Todo,
   TodoActionTypes,
 } from './types';
 
 
-// ********* Define Action Creator *********
+// ********* Action Types *********
 export const ADD_TODO = 'ADD_TODO';
 export const REMOVE_TODO = 'REMOVE_TODO';
 export const TOGGLE_TODO = 'TOGGLE_TODO';
 export const EDIT_TODO = 'EDIT_TODO';
 
 
-// ********* Action Creator *********
+// ********* Action Creators *********
 export const addTodo = (todo: Todo): TodoActionTypes => ({
   type: ADD_TODO,
   payload: todo,
@@ -27,10 +28,7 @@ export const toggleTodo = (id: number): TodoActionTypes => ({
   payload: id,
 });
 
-export const editTodo = (
-  id: number,
-  updatedTodo: Partial<Todo>
-): TodoActionTypes => ({
+export const editTodo = (id: number, updatedTodo: Partial<Todo>): TodoActionTypes => ({
   type: EDIT_TODO,
   payload: { id, updatedTodo },
 });

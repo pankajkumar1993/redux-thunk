@@ -8,6 +8,7 @@ import { AppDispatch } from '../../store';
 const TodoApp: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const todos = useSelector((state: RootState) => state.todos.todos);
+  // const loading = useSelector((state: RootState) => state.todos.loading);
   const [newTodo, setNewTodo] = useState('');
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
@@ -31,6 +32,8 @@ const TodoApp: React.FC = () => {
     setNewTodo(todo.title);
     setEditingTodoId(todo.id);
   };
+
+  // if (loading) return <p>Loading...</p>
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
