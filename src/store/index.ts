@@ -1,28 +1,41 @@
-// import {  createStore, applyMiddleware } from 'redux';
-import { legacy_createStore as createStore, applyMiddleware } from 'redux'
+import { legacy_createStore as createStore, applyMiddleware, compose } from 'redux';
 import { thunk, ThunkMiddleware } from 'redux-thunk';
 import rootReducer, { RootState } from './reducers';
 import { useDispatch } from 'react-redux';
 
+const composeEnhancers =
+  (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-// interface Window {
-//   __REDUX_DEVTOOLS_EXTENSION__?: () => any;
-// }
+const middleware = [thunk as unknown as ThunkMiddleware<RootState>];
 
-// // Use Redux DevTools Extension if available
-// const devTools = window.__REDUX_DEVTOOLS_EXTENSION__ ? window.__REDUX_DEVTOOLS_EXTENSION__() : (f: any) => f;
-
-// @ts-expect-error: Suppressing deprecated warning
 const store = createStore(
   rootReducer,
-  applyMiddleware(thunk as ThunkMiddleware<RootState>),
-  //  compose(applyMiddleware(thunk as ThunkMiddleware<RootState>), devTools)
+  composeEnhancers(applyMiddleware(...middleware))
 );
 
+export default store;
 
 
 export type AppDispatch = typeof store.dispatch
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 
 
-export default store;
+
+
+
+// import { legacy_createStore as createStore, applyMiddleware } from 'redux'
+// import { thunk, ThunkMiddleware } from 'redux-thunk';
+// import rootReducer, { RootState } from './reducers';
+// import { useDispatch } from 'react-redux';
+
+// // @ts-expect-error: Suppressing deprecated warning
+// const store = createStore(
+//   rootReducer,
+//   applyMiddleware(thunk as ThunkMiddleware<RootState>),
+// );
+
+// export type AppDispatch = typeof store.dispatch
+// export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
+
+
+// export default store;
