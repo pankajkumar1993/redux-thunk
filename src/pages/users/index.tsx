@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { fetchUsers, addUser, deleteUser } from '../../store/actions/userActions';
-import { RootState } from '../../store/reducers';
+import { RootState } from '../../store/rootReducer';
 import { useAppDispatch } from '../../store';
-import { User } from '../../types';
+import { User } from '../../store/users/types';
+import { addUser, deleteUser, fetchUsers } from '../../utils/api';
 
 const UserComponent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -11,22 +11,22 @@ const UserComponent: React.FC = () => {
   const [newUser, setNewUser] = useState<User>({ id: 0, name: '', email: '' });
 
   useEffect(() => {
-    dispatch(fetchUsers());
+    dispatch(fetchUsers() as any);
   }, [dispatch]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleAddUser = (e: any) => {
+  const handleAddUser = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(addUser({ ...newUser, id: Date.now() }));
+    dispatch(addUser({ ...newUser, id: Date.now() }) as any);
     setNewUser({ id: 0, name: '', email: '' });
   };
 
   const handleDeleteUser = (id: number) => {
-    dispatch(deleteUser(id));
+    dispatch(deleteUser(id) as any);
   };
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
+  if (!users.length) return <p>No Todo found!!</p>;
 
   return (
     <div className="p-6 max-w-2xl mx-auto">
@@ -56,7 +56,7 @@ const UserComponent: React.FC = () => {
       </form>
 
       <ul className="list-disc pl-5 space-y-2">
-        {users.map((user) => (
+        {users.sort((a, b) => b.id - a.id).map((user) => (
           <li key={user.id} className="flex justify-between items-center">
             <span className="text-lg">
               {user.name} ({user.email})

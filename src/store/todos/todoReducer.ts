@@ -1,11 +1,8 @@
+import { ADD_TODO, EDIT_TODO, REMOVE_TODO, TOGGLE_TODO } from './todoAction';
 import {
-  ADD_TODO,
-  REMOVE_TODO,
-  TOGGLE_TODO,
-  EDIT_TODO,
   Todo,
   TodoActionTypes,
-} from '../../types';
+} from './types';
 
 interface TodoState {
   todos: Todo[];

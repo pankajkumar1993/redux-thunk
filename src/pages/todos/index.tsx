@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../store/reducers/index';
-import { addTodo, removeTodo, toggleTodo } from '../../store/actions/todoAction';
-import { Todo } from '../../types';
+import { RootState } from '../../store/rootReducer';
+import { addTodo, removeTodo, toggleTodo } from '../../store/todos/todoAction';
+import { Todo } from '../../store/todos/types';
 import { AppDispatch } from '../../store';
 
 const TodoApp: React.FC = () => {

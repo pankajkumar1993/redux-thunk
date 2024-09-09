@@ -4,19 +4,19 @@ import UserComponent from "./pages/users"
 import RootLayout from "./layouts/RootLayout"
 
 const router = createBrowserRouter([
-  {
-    path: "/", element: <RootLayout />, children: [
-      { path: "/", element: <UserComponent /> },
-      { path: "/todos", element: <TodoApp /> }
-    ]
-  }
+    {
+        path: "/", element: <RootLayout />, children: [
+            { path: "/", element: <UserComponent /> },
+            { path: "/todos", element: <TodoApp /> }
+        ]
+    }
 ])
 
 function App() {
 
-  return (
-    <RouterProvider router={router} />
-  )
+    return (
+        <RouterProvider router={router} />
+    )
 }
 
 export default App

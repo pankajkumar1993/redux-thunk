@@ -1,15 +1,5 @@
-import {
-  FETCH_USERS,
-  FETCH_USERS_SUCCESS,
-  FETCH_USERS_ERROR,
-  ADD_USER,
-  ADD_USER_SUCCESS,
-  ADD_USER_ERROR,
-  DELETE_USER_SUCCESS,
-  DELETE_USER_ERROR,
-  UserActionTypes,
-  UserState,
-} from '../../types';
+import { UserActionTypes, UserState } from "./types";
+import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER_ERROR, DELETE_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "./userActions";
 
 const initialState: UserState = {
   users: [],

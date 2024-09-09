@@ -1,6 +1,6 @@
 import { legacy_createStore as createStore, applyMiddleware, compose } from 'redux';
 import { thunk, ThunkMiddleware } from 'redux-thunk';
-import rootReducer, { RootState } from './reducers';
+import rootReducer, { RootState } from './rootReducer';
 import { useDispatch } from 'react-redux';
 
 const composeEnhancers =
@@ -13,11 +13,11 @@ const store = createStore(
   composeEnhancers(applyMiddleware(...middleware))
 );
 
+export type AppDispatch = typeof store.dispatch;
+export const useAppDispatch: () => AppDispatch = useDispatch as unknown as () => AppDispatch;
+
 export default store;
 
-
-export type AppDispatch = typeof store.dispatch
-export const useAppDispatch = useDispatch.withTypes<AppDispatch>()
 
 
 
