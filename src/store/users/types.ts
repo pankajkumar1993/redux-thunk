@@ -14,6 +14,7 @@ export interface UserState {
     error: string | null;
 }
 
+// --------- Fetch User Action Type ---------
 interface FetchUsersAction {
     type: typeof FETCH_USERS;
 }
@@ -28,6 +29,7 @@ interface FetchUsersErrorAction {
     payload: string;
 }
 
+// --------- Add User Action Type ---------
 interface AddUserAction {
     type: typeof ADD_USER;
 }
@@ -42,6 +44,7 @@ interface AddUserErrorAction {
     payload: string;
 }
 
+// --------- Delete User Action Type ---------
 interface DeleteUserAction {
     type: typeof DELETE_USER;
 }
@@ -55,6 +58,8 @@ interface DeleteUserErrorAction {
     type: typeof DELETE_USER_ERROR;
     payload: string;
 }
+
+// --------- Edit User Action Type ---------
 interface EditUserAction {
     type: typeof EDIT_USER;
 }
