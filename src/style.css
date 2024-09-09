@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  @apply font-fontPrimary bg-gray-100 h-full;
+}
+
+#root {
+  @apply flex flex-col h-full;
+}
+
+main {
+  @apply flex-1 py-10;
+}
+
+.card {
+  @apply p-4 md:p-8 shadow rounded bg-white hover:shadow-md cursor-pointer;
+}
+
+.btn {
+  @apply px-4 py-2 rounded inline-block cursor-pointer text-center;
+}
+
+.btn-icon {
+  @apply p-2 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer text-center;
+}
+
+.btn-primary {
+  @apply border-green-500 bg-green-500 text-white hover:bg-green-600 hover:border-green-600;
+}
+
+.btn-danger {
+  @apply border-red-500 bg-red-500 text-white hover:bg-red-600 hover:border-red-600;
+}
+
+.btn-dark {
+  @apply border-black bg-black text-white hover:bg-gray-900 hover:border-gray-900;
+}
+
+.form-control {
+  @apply border-2 border-gray-200 rounded px-4 py-2 block w-full hover:border-green-500 focus:border-green-500 outline-0;
+
+}
+
+.form-label {
+  @apply mb-3 font-medium text-lg;
+}
