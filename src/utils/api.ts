@@ -1,5 +1,5 @@
 import axios from "axios";
-import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER, DELETE_USER_ERROR, DELETE_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "../store/users/userActions";
+import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER, DELETE_USER_ERROR, DELETE_USER_SUCCESS, EDIT_USER, EDIT_USER_ERROR, EDIT_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "../store/users/userActions";
 import { Dispatch } from "redux";
 import { User, UserActionTypes } from "../store/users/types";
 
@@ -72,6 +72,31 @@ export const deleteUser = (id: number) => async (dispatch: Dispatch<UserActionTy
         } else {
             dispatch({
                 type: DELETE_USER_ERROR,
+                payload: 'An unknown error occurred.',
+            });
+        }
+    }
+};
+
+// ************************ Edit Action ************************
+export const editUser = (user: User) => async (dispatch: Dispatch<UserActionTypes>) => {
+    dispatch({ type: EDIT_USER });
+
+    try {
+        await axios.put(`https://dummyjson.com/users/${user.id}`, user);
+        dispatch({
+            type: EDIT_USER_SUCCESS,
+            payload: user,
+        });
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            dispatch({
+                type: EDIT_USER_ERROR,
+                payload: error.message,
+            });
+        } else {
+            dispatch({
+                type: EDIT_USER_ERROR,
                 payload: 'An unknown error occurred.',
             });
         }

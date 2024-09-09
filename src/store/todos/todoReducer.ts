@@ -14,6 +14,16 @@ const initialState: TodoState = {
       id: 1,
       title: "First Task",
       completed: false,
+    },
+    {
+      id: 2,
+      title: "Second Task",
+      completed: false,
+    },
+    {
+      id: 3,
+      title: "Third Task",
+      completed: false,
     }
   ],
 };

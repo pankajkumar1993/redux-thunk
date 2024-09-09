@@ -1,9 +1,10 @@
-import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER, DELETE_USER_ERROR, DELETE_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "./userActions";
+import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER, DELETE_USER_ERROR, DELETE_USER_SUCCESS, EDIT_USER, EDIT_USER_ERROR, EDIT_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "./userActions";
 
 // ************************* User Types *************************
 export interface User {
     id: number;
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
 }
 
@@ -54,6 +55,19 @@ interface DeleteUserErrorAction {
     type: typeof DELETE_USER_ERROR;
     payload: string;
 }
+interface EditUserAction {
+    type: typeof EDIT_USER;
+}
+
+interface EditUserSuccessAction {
+    type: typeof EDIT_USER_SUCCESS;
+    payload: User;
+}
+
+interface EditUserErrorAction {
+    type: typeof EDIT_USER_ERROR;
+    payload: string;
+}
 
 export type UserActionTypes =
     | FetchUsersAction
@@ -64,4 +78,7 @@ export type UserActionTypes =
     | AddUserErrorAction
     | DeleteUserAction
     | DeleteUserSuccessAction
-    | DeleteUserErrorAction;
+    | DeleteUserErrorAction
+    | EditUserAction
+    | EditUserSuccessAction
+    | EditUserErrorAction;

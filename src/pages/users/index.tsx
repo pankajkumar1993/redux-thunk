@@ -1,23 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/rootReducer';
-import { useAppDispatch } from '../../store';
-import { User } from '../../store/users/types';
-import { addUser, deleteUser, fetchUsers } from '../../utils/api';
+import { useEffect, useState } from "react";
+import { useAppDispatch } from "../../store";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/rootReducer";
+import { User } from "../../store/users/types";
+import { addUser, deleteUser, editUser, fetchUsers } from "../../utils/api";
 
 const UserComponent: React.FC = () => {
   const dispatch = useAppDispatch();
   const { users, loading, error } = useSelector((state: RootState) => state.users);
-  const [newUser, setNewUser] = useState<User>({ id: 0, name: '', email: '' });
+  const [newUser, setNewUser] = useState<User>({ id: 0, firstName: '', lastName: '', email: '' });
+  const [editingUserId, setEditingUserId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchUsers() as any);
   }, [dispatch]);
 
-  const handleAddUser = (e: React.FormEvent) => {
+  const handleAddOrEditUser = (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(addUser({ ...newUser, id: Date.now() }) as any);
-    setNewUser({ id: 0, name: '', email: '' });
+    if (editingUserId !== null) {
+      dispatch(editUser(newUser) as any);
+      setEditingUserId(null);
+    } else {
+      dispatch(addUser({ ...newUser, id: Date.now() }) as any);
+    }
+    setNewUser({ id: 0, firstName: '', lastName: '', email: '' });
+  };
+
+  const handleEditUser = (user: User) => {
+    setNewUser(user);
+    setEditingUserId(user.id);
   };
 
   const handleDeleteUser = (id: number) => {
@@ -26,51 +37,71 @@ const UserComponent: React.FC = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-  if (!users.length) return <p>No Todo found!!</p>;
+  if (!users.length) return <p>No Users found!!</p>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-3xl font-bold mb-4">User Management</h1>
+    <>
+      <div className="card mb-5">
+        <h1 className="text-2xl font-bold mb-4">User Management</h1>
 
-      <form className="mb-6" onSubmit={handleAddUser}>
-        <input
-          type="text"
-          placeholder="Name"
-          value={newUser.name}
-          onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-          className="border border-gray-300 rounded-lg p-2 w-full mb-4"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={newUser.email}
-          onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-          className="border border-gray-300 rounded-lg p-2 w-full mb-4"
-        />
-        <button
-          type='submit'
-          className="bg-blue-500 text-white rounded-lg p-2 hover:bg-blue-600"
-        >
-          Add User
-        </button>
-      </form>
-
-      <ul className="list-disc pl-5 space-y-2">
+        <form className="mb-6 flex gap-4 items-center" onSubmit={handleAddOrEditUser}>
+          <input
+            type="text"
+            placeholder="First Name"
+            value={newUser.firstName}
+            onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+            className="form-control"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Last Name"
+            value={newUser.lastName}
+            onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+            className="form-control"
+            required
+          />
+          <input
+            type="email"
+            placeholder="Email"
+            value={newUser.email}
+            onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+            className="form-control"
+            required
+          />
+          <button
+            type='submit'
+            className="btn btn-primary flex-shrink-0"
+          >
+            {editingUserId !== null ? 'Update User' : 'Add User'}
+          </button>
+        </form>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
         {users.sort((a, b) => b.id - a.id).map((user) => (
-          <li key={user.id} className="flex justify-between items-center">
-            <span className="text-lg">
-              {user.name} ({user.email})
-            </span>
-            <button
-              onClick={() => handleDeleteUser(user.id)}
-              className="bg-red-500 text-white rounded-lg p-1 hover:bg-red-600"
-            >
-              Delete
-            </button>
-          </li>
+          <div key={user.id} className="card flex flex-col gap-3">
+            <div>
+              <h2 className="text-lg font-semibold">{user.firstName} {user.lastName}</h2>
+              <p> ({user.email})</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleEditUser(user)}
+                className="btn-sm btn-dark"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => handleDeleteUser(user.id)}
+                className="btn-sm btn-danger"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import { UserActionTypes, UserState } from "./types";
-import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER_ERROR, DELETE_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "./userActions";
+import { ADD_USER, ADD_USER_ERROR, ADD_USER_SUCCESS, DELETE_USER_ERROR, DELETE_USER_SUCCESS, EDIT_USER, EDIT_USER_ERROR, EDIT_USER_SUCCESS, FETCH_USERS, FETCH_USERS_ERROR, FETCH_USERS_SUCCESS } from "./userActions";
 
 const initialState: UserState = {
   users: [],
@@ -44,6 +44,29 @@ const userReducer = (state = initialState, action: UserActionTypes): UserState =
         ...state,
         users: state.users.filter((user) => user.id !== action.payload),
       };
+
+    case EDIT_USER:
+      return {
+        ...state,
+        loading: true,
+      };
+
+    case EDIT_USER_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        users: state.users.map((user) =>
+          user.id === action.payload.id ? action.payload : user
+        ),
+      };
+
+    case EDIT_USER_ERROR:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
 
     default:
       return state;
