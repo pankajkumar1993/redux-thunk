@@ -1,0 +1,106 @@
+/* @font-face {
+    font-family: "NunitoSans100";
+    font-style: normal;
+    font-weight: 100;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans-Thin);
+}
+
+.NunitoSans100 {
+    font-family: var(--int-thin) !important;
+} */
+/* @font-face {
+    font-family: "NunitoSans200";
+    font-style: normal;
+    font-weight: 200;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_7pt-ExtraLight.ttf);
+}
+
+.NunitoSans200 {
+    font-family: var(--int-extraLight) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans300";
+    font-style: normal;
+    font-weight: 300;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_7pt-Light.ttf);
+}
+
+.NunitoSans300 {
+    font-family: var(--int-light) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans400";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_7pt-Regular.ttf);
+}
+
+.NunitoSans400 {
+    font-family: var(--int-regular) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans500";
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_7pt-Medium.ttf);
+}
+
+.NunitoSans500 {
+    font-family: var(--int-medium) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans600";
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_10pt-SemiBold.ttf);
+}
+
+.NunitoSans600 {
+    font-family: var(--int-semibold) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans700";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_10pt-Bold.ttf);
+}
+
+.NunitoSans700 {
+    font-family: var(--int-bold) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans800";
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_10pt-ExtraBold.ttf);
+}
+
+.NunitoSans800 {
+    font-family: var(--int-extraBold) !important;
+}
+
+@font-face {
+    font-family: "NunitoSans900";
+    font-style: normal;
+    font-weight: 900;
+    font-display: swap;
+    src: url(../fonts/NunitoSans/NunitoSans_10pt-Black.ttf);
+}
+
+.NunitoSans900 {
+    font-family: var(--int-black) !important;
+} */

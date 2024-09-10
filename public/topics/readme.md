@@ -1030,10 +1030,12 @@ If it's a normal action object (or anything else), it's forwarded to the next mi
 # Folder Structure for Redux Store
 store/             
   user/
+    index.ts
     actions.ts
     reducer.ts
     types.ts  (All types defined and used in this user store module)
   todo/
+    index.ts
     actions.ts
     reducer.ts
     types.ts

@@ -1,0 +1,704 @@
+-----------------------------------------------------------------------------------------------------
+.env_sample
+REACT_APP_API_PATH = 'http://localhost:8000'
+
+REACT_APP_S3_BUCKET = "BUCKET_NAME"
+REACT_APP_S3_REGION = "BUCKET_REGION"
+REACT_APP_S3_ACCESS_KEY = "AWS_ACCESS_KEY"
+REACT_APP_S3_SECRET_KEY = "AWS_SECRET_KEY"
+REACT_APP_S3_BASE_PATH = "S3_BASE_PATH"
+
+REACT_APP_LOCALE = "en"    // "en" or "ar"
+
+
+-----------------------------------------------------------------------------------------------------
+store/configureStore.ts
+
+import { Store } from "redux";
+import rootReducer from "./reducers";
+import thunk from "redux-thunk";
+import { persistReducer, Persistor } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { RootStateInterface } from "./RootState";
+import { configureStore } from '@reduxjs/toolkit'
+
+export interface StoreConfig {
+  store: Store<RootStateInterface>;
+  persistor: Persistor;
+}
+
+const persistConfig = {
+  key: "root_v1.3",
+  storage,
+  blacklist: [
+    "alerts"
+  ]
+};
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = configureStore({
+  reducer: persistedReducer,
+  devTools: process.env.NODE_ENV !== 'production',
+  middleware: [thunk]
+});
+
+export default store;
+
+
+-----------------------------------------------------------------------------------------------------
+store/index.ts
+
+import { persistStore } from "redux-persist";
+import store from "./configureStore";
+export * from "./RootState";
+
+
+const persistor = persistStore(store);
+
+export { store, persistor};
+
+
+-----------------------------------------------------------------------------------------------------
+store/rootReducers.ts
+
+import { combineReducers } from 'redux';
+import { alertsReducer } from "./alerts";
+import { adminInfoReducer } from './admin';
+import { userInfoReducer } from './users';
+import { opportunityInfoReducer } from './opportunity';
+import { feedbackReducer } from './feedback';
+import { featuredServicesReducer } from './featuredServices';
+import { PaymentReducer } from './Payments';
+import { pendingCardReducer } from './PendingCustomCards';
+
+
+const rootReducer = combineReducers({
+    alerts: alertsReducer,
+    adminInfo: adminInfoReducer,
+    users: userInfoReducer,
+    opportunity: opportunityInfoReducer,
+    feedback: feedbackReducer,
+    featuredServices: featuredServicesReducer,
+    paymentStore: PaymentReducer,
+    pendingCardStore: pendingCardReducer
+});
+
+export default rootReducer;
+
+
+-----------------------------------------------------------------------------------------------------
+store/RootState.ts
+import { adminInfoInterface } from "../services/dataType/reduxActionsInterfaces/adminStoreInterfaces";
+import { PaymentStoreInterface } from "./Payments";
+import { pendingCardStoreInterface } from "./PendingCustomCards";
+import { AlertsInterface } from "./alerts";
+import { featuredServicesStoreInterface } from "./featuredServices";
+import { FeedbackStoreInterface } from "./feedback";
+import { opportunityStoreInterface } from "./opportunity";
+import { userStoreInterface } from "./users";
+
+export interface RootStateInterface {
+    feedback: any;
+    // feedback: FeedbackStoreInterface;
+    alerts: AlertsInterface;
+    adminInfo: adminInfoInterface;
+    users: userStoreInterface;
+    opportunity: opportunityStoreInterface;
+    featuredServices: featuredServicesStoreInterface;
+    paymentStore: PaymentStoreInterface;
+    pendingCardStore: pendingCardStoreInterface;
+}
+
+export type RootStateType = RootStateInterface;
+
+-----------------------------------------------------------------------------------------------------
+# folder structure
+store/
+  /user
+  /admin
+  /auth
+    /action.ts
+    /index.ts
+    /reducer.ts
+    /index.ts
+
+utils/
+    /commonImports.tsx
+    / servies.ts
+
+
+-----------------------------------------------------------------------------------------------------
+# utils/commonImports.tsx
+import { useEffect, useState, createContext, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+
+
+// React Exports
+export {
+    useState, useEffect, createContext, useRef
+}
+export {
+    useDispatch, useSelector
+}
+export {
+    useNavigate, useParams
+}
+// Redux Exports
+export {
+    useDispatch, useSelector
+}
+export {
+    Box, Tab, Tabs, Typography, Avatar, Container, Divider, Grid, IconButton, Chip, Paper,
+    Stack, Button, TextField
+}
+
+// Icons Export 
+export {
+    KeyboardBackspace, CheckCircleOutlined, NewReleasesOutlined, Add, EditNote, ModeEdit, EditLocationAlt, ModeEditOutline
+}
+
+-----------------------------------------------------------------------------------------------------
+# utlis/imageSizeValidator.ts
+export default function imageSizeValidation(file: any, callback: (isValid: boolean) => void) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        if (e.target && e.target.result) {
+            const img = new Image();
+            img.onload = () => {
+                // Calculate aspect ratio
+                const aspectRatio = img.width / img.height;
+                // Check aspect ratio
+                const requiredAspectRatio = 3 / 1; // Required aspect ratio (width:height)
+                if (Math.abs(aspectRatio - requiredAspectRatio) > 0.01) {
+                    callback(false);
+                } else {
+                    console.log("FINE");
+                    callback(true);
+                }
+            };
+            img.src = e.target.result as string; // Type assertion
+        } else {
+            console.error("Failed to read file.");
+            callback(false);
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+
+-----------------------------------------------------------------------------------------------------
+s3Config.ts
+import {
+    S3Client, DeleteObjectCommand
+    // HeadObjectCommand 
+} from "@aws-sdk/client-s3";
+
+
+const REGION = process.env.REACT_APP_S3_REGION;
+const accessKeyId = process.env.REACT_APP_S3_ACCESS_KEY;
+const secretAccessKey = process.env.REACT_APP_S3_SECRET_KEY;
+const BASE_URL = process.env.REACT_APP_S3_BASE_PATH;
+const S3_BUCKET_NAME = process.env.REACT_APP_S3_BUCKET;
+
+let s3ClientConfigured: any = S3Client
+
+if (accessKeyId && secretAccessKey) {
+    s3ClientConfigured = new S3Client({
+        credentials: {
+            accessKeyId: accessKeyId,
+            secretAccessKey: secretAccessKey
+        },
+        region: REGION
+    });
+}
+
+// Function to delete an object
+export async function deleteS3Object(objectKey: string) {
+    try {
+        const params = {
+            Bucket: S3_BUCKET_NAME, // Specify the name of the bucket
+            Key: objectKey // Specify the key of the object to delete
+        };
+
+        const command = new DeleteObjectCommand(params);
+        const response = await s3ClientConfigured.send(command);
+        console.log('Object deleted successfully:', response);
+    } catch (err) {
+        console.error('Error deleting object:', err);
+    }
+}
+
+
+export default s3ClientConfigured;
+
+-----------------------------------------------------------------------------------------------------
+# utils/services.ts
+import Axios, { AxiosResponse } from 'axios';
+import { BASE_PATH } from '../constants';
+import { store } from '../store';
+import { AlertsInterface, HideProgressBar, ShowErrorAlert } from '../store/alerts';
+import { adminInfoInterface } from '../services/dataType/reduxActionsInterfaces/adminStoreInterfaces';
+import { ResetAdminStore } from '../store/admin';
+import { translateLanguage } from '../translation';
+
+export const postRequest = (endpoint: string, body: any) => {
+    const { dispatch } = store;
+
+    const stateValues = store.getState()
+    const alertsInfo: AlertsInterface = stateValues.alerts;
+    const currentLanguage = alertsInfo ? alertsInfo.currentLanguage : "en"
+    body['x_language'] = currentLanguage
+
+    return Axios.post(getApiPath(endpoint), JSON.stringify(body), getConfigSetting())
+        .then(response => {
+            dispatch(HideProgressBar());
+            if (isApiCodeSucess(response)) {
+                return response.data;
+            }
+        }).catch(function (error: any) {
+            dispatch(HideProgressBar());
+            handleErrorResponse(error);
+        });
+};
+
+export const patchRequest = (endpoint: string, body: any, token?: string) => {
+    const { dispatch } = store;
+
+
+    const stateValues = store.getState()
+    const alertsInfo: AlertsInterface = stateValues.alerts;
+    const currentLanguage = alertsInfo ? alertsInfo.currentLanguage : "en"
+
+    body['x_language'] = currentLanguage
+
+
+    return Axios.patch(getApiPath(endpoint), JSON.stringify(body), getConfigSetting()).then(response => {
+        dispatch(HideProgressBar());
+        if (isApiCodeSucess(response)) {
+            return response.data;
+        }
+    }).catch(function (error: any) {
+        handleErrorResponse(error);
+    });
+};
+
+export const getRequest = (endpoint: string, token?: string) => {
+    const { dispatch } = store;
+
+    return Axios.get(getApiPath(endpoint), getConfigSetting()).then(response => {
+        dispatch(HideProgressBar());
+        if (isApiCodeSucess(response)) {
+            return response.data;
+        }
+    })
+        .catch(function (error: any) {
+            dispatch(HideProgressBar());
+            handleErrorResponse(error);
+        });
+};
+
+const getApiPath = (endpoint: string) => BASE_PATH + '/api/admin/' + endpoint;
+
+const getConfigSetting = () => {
+    const stateValues = store.getState()
+    const adminInfo: adminInfoInterface = stateValues.adminInfo;
+    const token = adminInfo ? adminInfo.accessToken : ""
+
+    const alertsInfo: AlertsInterface = stateValues.alerts;
+    const currentLanguage = alertsInfo ? alertsInfo.currentLanguage : "en"
+    let headers: any = {
+        'content-type': 'application/json',
+    };
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+        // headers['Accept-Language'] = currentLanguage
+    }
+
+    return {
+        headers: headers,
+    };
+};
+
+const handleErrorResponse = (error: any) => {
+    const { dispatch } = store;
+
+    if (error.code === "ERR_NETWORK") {
+        dispatch(ShowErrorAlert({ visible: true, message: translateLanguage("NO_INTERNET") }));
+    }
+    else if (error.response.status === 401) {
+        dispatch(ShowErrorAlert({ visible: true, message: translateLanguage("SESSION_EXPIRED") }));
+        dispatch(ResetAdminStore())
+        window.location.reload();
+    }
+    else if (error.response.status === 403) {
+        dispatch(ShowErrorAlert({ visible: true, message: translateLanguage("WENT_WRONG_ERROR") }));
+    }
+    else if (error.response.data.code === 400 && error.response.data.message !== '') {
+        dispatch(ShowErrorAlert({ visible: true, message: error.response.data.message }));
+    } else {
+        dispatch(ShowErrorAlert({ visible: true, message: error.message }));
+    }
+
+};
+
+export const isApiCodeSucess = (resp: AxiosResponse) => {
+    const { dispatch } = store;
+    if (resp.data.code === 400) {
+        dispatch(ShowErrorAlert({ visible: true, message: resp.data.message }));
+        return false
+
+    } else if (resp?.data?.code === 500) {
+        dispatch(ShowErrorAlert({ visible: true, message: "Backend : " + resp.data.message }));
+        return false
+    }
+
+    return true;
+};
+
+
+-----------------------------------------------------------------------------------------------------
+# Routing
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
+
+import { useSelector } from 'react-redux';
+import { RootStateType } from './store';
+
+// Pages Imports Here
+import SignIn from './pages/Signin/SignIn';
+import DashboardLayout from './pages/Layout/DashboardLayout';
+import Dashboard from './pages/Dashboard/Dashboard';
+import UserList from "./pages/Users/UserList";
+import OpportunityList from "./pages/Opportunity/OpportunityList";
+import StateCityList from "./pages/States/StateCityList";
+import UserDetailsPage from "./pages/Users/UserDetail/UserDetail";
+import OpportunityDetail from "./pages/Opportunity/OpportunityDetail/OpportunityDetail";
+import RelationList from "./pages/Relations/RelationList";
+import ToastAlertList from "./pages/ToastAlert/ToastAlertList";
+import CustomCardsList from "./pages/CustomCards/CardsList";
+import Feedback from "./pages/Feedback/Feedback";
+import FeaturedServicesList from "./pages/featuredServices/FeaturedServicesList";
+import UserPaymentDetail from "./pages/Users/UserDetail/UserPaymentDetail";
+import PaymentList from "./pages/payments/PaymentList";
+import PendingCustomCard from "./pages/pendingCustomCard/PendingCustomCard";
+import PendingCardDetail from "./pages/pendingCustomCard/pendingCardDetail/PendingCardDetail";
+
+export const PrivateRoute = ({ children, ...rest }: any) => {
+  let adminInfo = useSelector((state: RootStateType) => state.adminInfo);
+  let accessToken: string = adminInfo.accessToken;
+
+  if (!accessToken) {
+    return <Navigate to={{ pathname: "/" }} />;
+  }
+  return children;
+};
+
+export const IsLoggedIn = ({ children, ...rest }: any) => {
+  let adminInfo = useSelector((state: RootStateType) => state.adminInfo);
+  let accessToken: string = adminInfo.accessToken;
+
+  if (accessToken) {
+    return <Navigate to={{ pathname: "/dashboard/" }} />;
+  }
+
+  return children;
+};
+
+export const PrivateRoutes: any = (
+  <>
+    <Routes>
+      <Route path="/dashboard" element={<Dashboard />} />
+
+      <Route path="/users" element={<UserList />} />
+      {/* <Route path="/users/groom" element={<UserList filterType="groom" />} />
+      <Route path="/users/palace" element={<UserList filterType="palace" />} /> */}
+
+      <Route path="/users/detail/:userId" element={<UserDetailsPage />} />
+      <Route path="/users/detail/user-payment-detail/:paymentId" element={<UserPaymentDetail />} />
+
+      <Route path="/opportunity" element={<OpportunityList />} />
+      <Route
+        path="/opportunity/detail/:opportunityId"
+        element={<OpportunityDetail />}
+      />
+
+      <Route path='/state-city' element={<StateCityList />} />
+      <Route path='/relation' element={<RelationList />} />
+      <Route path='/feedback' element={<Feedback />} />
+      <Route path='/toast' element={<ToastAlertList />} />
+      <Route path='/custom-card' element={<CustomCardsList />} />
+
+      <Route path='/featured-services' element={<FeaturedServicesList />} />
+      <Route path='/payments' element={<PaymentList />} />
+
+      <Route path='/pending-cards' element={<PendingCustomCard />} />
+      <Route path='/pending-cards/detail/:pendingCardId' element={<PendingCardDetail />} />
+    </Routes>
+
+  </>
+);
+
+export default function Routing() {
+  return (
+    <>
+      <Router>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <IsLoggedIn>
+                <SignIn />
+              </IsLoggedIn>
+            }
+          />
+          <Route
+            path="/*"
+            element={
+              <PrivateRoute>
+                <DashboardLayout />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </>
+  );
+}
+
+
+-----------------------------------------------------------------------------------------------------
+reportWebVitals.ts
+import { ReportHandler } from 'web-vitals';
+
+const reportWebVitals = (onPerfEntry?: ReportHandler) => {
+  if (onPerfEntry && onPerfEntry instanceof Function) {
+    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+      getCLS(onPerfEntry);
+      getFID(onPerfEntry);
+      getFCP(onPerfEntry);
+      getLCP(onPerfEntry);
+      getTTFB(onPerfEntry);
+    });
+  }
+};
+
+export default reportWebVitals;
+
+-----------------------------------------------------------------------------------------------------
+theme.ts
+import { red } from '@mui/material/colors';
+import { createTheme } from '@mui/material/styles';
+// import { arSD } from '@mui/x-data-grid/locales';
+import { arSD } from '@mui/material/locale'
+
+// Get environment variables for locale and direction
+const locale = process.env.REACT_APP_LOCALE; // Example: 'arSD'
+
+// Create a theme instance.
+const theme = createTheme(
+  {
+    direction: (locale === "ar") ? 'rtl' : 'ltr',
+    typography: {
+      button: {
+        textTransform: 'none'
+      }
+    },
+    palette: {
+      primary: {
+        main: '#0098e5',
+      },
+      secondary: {
+        main: '#19857b',
+      },
+      error: {
+        main: red.A400,
+      },
+    },
+  },
+  (locale === "ar") ? arSD : {}
+);
+
+export default theme;
+
+-----------------------------------------------------------------------------------------------------
+# translations.js
+const translations: Record<string, Record<string, string>> = {
+    "en": require('./tranlations/translation_en.json'),
+    "ar": require('./tranlations/translation_ar.json')
+};
+
+const locale = process.env.REACT_APP_LOCALE;
+
+export const translateLanguage = (key: string) => {
+    let langauge = (locale === "ar") ? "ar" : "en"
+
+    // if (localStorage.getItem('language')) {
+    //     langauge = localStorage.getItem('language') || "en"
+    // }
+
+    let returnText: string = translations[langauge][key]
+    return returnText
+}
+
+export default translations;
+
+-----------------------------------------------------------------------------------------------------
+# package.json
+    "@aws-sdk/client-s3": "^3.523.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@material-tailwind/react": "^2.1.9",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.15.14",
+    "@mui/x-data-grid": "^6.19.4",
+    "@reduxjs/toolkit": "^1.9.5",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^13.0.0",
+    "@testing-library/user-event": "^13.2.1",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^16.7.13",
+    "date-fns": "^3.6.0",
+    "env-cmd": "^10.1.0",
+    "file-saver": "^2.0.5",
+    "final-form": "^4.20.9",
+    "loadash": "^1.0.0",
+    "moment": "^2.30.1",
+    "react-cache-buster": "^0.1.8",
+    "react-csv": "^2.2.2",
+    "react-date-range": "^2.0.0-alpha.4",
+    "react-dom": "^18.2.0",
+    "react-final-form": "^6.5.9",
+    "react-pro-sidebar": "^1.1.0",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-persist": "^6.0.0",
+    "web-vitals": "^2.1.0",
+    "xlsx": "^0.18.5"
+    "react-app/jest"
+    "@types/file-saver": "^2.0.7",
+    "@types/lodash": "^4.17.0",
+    "@types/react-csv": "^1.1.10",
+    "@types/react-date-range": "^1.4.9",
+-----------------------------------------------------------------------------------------------------
+"scripts": {
+  "start": "yarn generate-meta-tag && env-cmd -f .env react-scripts start",
+  "build": "yarn generate-meta-tag && react-scripts build",
+  "test": "react-scripts test",
+  "eject": "react-scripts eject",
+  "build:development": "yarn generate-meta-tag && env-cmd -f .env.development react-scripts build",
+  "build:production": "yarn generate-meta-tag && env-cmd -f .env.prod react-scripts build",
+  "generate-meta-tag": "node ./node_modules/react-cache-buster/dist/generate-meta-tag.js"
+},
+
+-----------------------------------------------------------------------------------------------------
+Update the Actions and Action Types:
+
+First, you need to define actions for loading and error states in your action types and action creators.
+
+typescript
+Copy code
+// todoAction.ts
+
+export const ADD_TODO_REQUEST = 'ADD_TODO_REQUEST';
+export const ADD_TODO_SUCCESS = 'ADD_TODO_SUCCESS';
+export const ADD_TODO_FAILURE = 'ADD_TODO_FAILURE';
+
+export const REMOVE_TODO_REQUEST = 'REMOVE_TODO_REQUEST';
+export const REMOVE_TODO_SUCCESS = 'REMOVE_TODO_SUCCESS';
+export const REMOVE_TODO_FAILURE = 'REMOVE_TODO_FAILURE';
+
+export const EDIT_TODO_REQUEST = 'EDIT_TODO_REQUEST';
+export const EDIT_TODO_SUCCESS = 'EDIT_TODO_SUCCESS';
+export const EDIT_TODO_FAILURE = 'EDIT_TODO_FAILURE';
+
+// Action types for async operations
+interface AddTodoRequestAction { type: typeof ADD_TODO_REQUEST; }
+interface AddTodoSuccessAction { type: typeof ADD_TODO_SUCCESS; payload: Todo; }
+interface AddTodoFailureAction { type: typeof ADD_TODO_FAILURE; payload: string; }
+
+interface RemoveTodoRequestAction { type: typeof REMOVE_TODO_REQUEST; }
+interface RemoveTodoSuccessAction { type: typeof REMOVE_TODO_SUCCESS; payload: number; }
+interface RemoveTodoFailureAction { type: typeof REMOVE_TODO_FAILURE; payload: string; }
+
+interface EditTodoRequestAction { type: typeof EDIT_TODO_REQUEST; }
+interface EditTodoSuccessAction { type: typeof EDIT_TODO_SUCCESS; payload: Todo; }
+interface EditTodoFailureAction { type: typeof EDIT_TODO_FAILURE; payload: string; }
+
+export type TodoActionTypes =
+  | AddTodoRequestAction
+  | AddTodoSuccessAction
+  | AddTodoFailureAction
+  | RemoveTodoRequestAction
+  | RemoveTodoSuccessAction
+  | RemoveTodoFailureAction
+  | EditTodoRequestAction
+  | EditTodoSuccessAction
+  | EditTodoFailureAction;
+Update the Reducer to Handle New Actions:
+
+Modify the todoReducer to handle the new actions for loading and error states.
+
+typescript
+Copy code
+const todoReducer = (
+  state = initialState,
+  action: TodoActionTypes
+): TodoState => {
+  switch (action.type) {
+    case ADD_TODO_REQUEST:
+    case REMOVE_TODO_REQUEST:
+    case EDIT_TODO_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: ''
+      };
+
+    case ADD_TODO_SUCCESS:
+      return {
+        ...state,
+        todos: [...state.todos, action.payload],
+        loading: false,
+        error: ''
+      };
+
+    case REMOVE_TODO_SUCCESS:
+      return {
+        ...state,
+        todos: state.todos.filter((todo) => todo.id !== action.payload),
+        loading: false,
+        error: ''
+      };
+
+    case EDIT_TODO_SUCCESS:
+      return {
+        ...state,
+        todos: state.todos.map((todo) =>
+          todo.id === action.payload.id
+            ? { ...todo, ...action.payload }
+            : todo
+        ),
+        loading: false,
+        error: ''
+      };
+
+    case ADD_TODO_FAILURE:
+    case REMOVE_TODO_FAILURE:
+    case EDIT_TODO_FAILURE:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload
+      };
+
+    default:
+      return state;
+  }
+};
+
+export default todoReducer;
+Handle Actions in Async Thunks or Middleware:

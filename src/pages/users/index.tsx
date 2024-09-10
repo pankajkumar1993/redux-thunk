@@ -37,7 +37,7 @@ const UserComponent: React.FC = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
-  if (!users.length) return <p>No Users found!!</p>;
+  if (!users?.length) return <p>No Users found!!</p>;
 
   return (
     <>
@@ -78,7 +78,7 @@ const UserComponent: React.FC = () => {
         </form>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {users.sort((a, b) => b.id - a.id).map((user) => (
+        {users?.sort((a, b) => b.id - a.id)?.map((user) => (
           <div key={user.id} className="card flex flex-col gap-3">
             <div>
               <h2 className="text-lg font-semibold">{user.firstName} {user.lastName}</h2>

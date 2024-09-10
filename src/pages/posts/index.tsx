@@ -17,10 +17,10 @@ const PostComponent: React.FC = () => {
 
         if (editingPostId !== null) {
             const updatedPost: Post = { id: editingPostId, title, content };
-            dispatch(updatePost(updatedPost));
+            dispatch(updatePost(updatedPost) as any);
         } else {
             const newPost: Post = { id: Date.now(), title, content };
-            dispatch(addPost(newPost));
+            dispatch(addPost(newPost) as any);
         }
 
         setTitle('');
@@ -35,7 +35,7 @@ const PostComponent: React.FC = () => {
     };
 
     const handleDeletePost = (id: number) => {
-        dispatch(deletePost(id));
+        dispatch(deletePost(id) as any);
         if (editingPostId === id) {
             setTitle('');
             setContent('');

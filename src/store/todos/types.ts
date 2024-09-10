@@ -7,6 +7,10 @@ export interface Todo {
     completed: boolean;
 }
 
+export interface TodoState {
+    todos: Todo[];
+}
+
 export interface AddTodoAction {
     type: typeof ADD_TODO;
     payload: Todo;

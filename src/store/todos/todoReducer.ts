@@ -1,12 +1,10 @@
 import { ADD_TODO, EDIT_TODO, REMOVE_TODO, TOGGLE_TODO } from './todoActions';
 import {
-  Todo,
   TodoActionTypes,
+  TodoState,
 } from './types';
 
-interface TodoState {
-  todos: Todo[];
-}
+
 
 const initialState: TodoState = {
   todos: [
