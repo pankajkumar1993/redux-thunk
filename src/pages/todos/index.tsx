@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/rootReducer';
-import { addTodo, removeTodo, toggleTodo, editTodo } from '../../store/todos/todoAction';
+import { addTodo, removeTodo, toggleTodo, editTodo } from '../../store/todos/todoActions';
 import { Todo } from '../../store/todos/types';
 import { AppDispatch } from '../../store';
 
 const TodoApp: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const todos = useSelector((state: RootState) => state.todos.todos);
-  // const loading = useSelector((state: RootState) => state.todos.loading);
   const [newTodo, setNewTodo] = useState('');
   const [editingTodoId, setEditingTodoId] = useState<number | null>(null);
 
@@ -33,7 +32,6 @@ const TodoApp: React.FC = () => {
     setEditingTodoId(todo.id);
   };
 
-  // if (loading) return <p>Loading...</p>
 
   return (
     <div className="max-w-2xl mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
@@ -61,7 +59,7 @@ const TodoApp: React.FC = () => {
 
       {todos.length > 0 ?
         <ul className="space-y-4">
-          {todos.map((todo) => (
+          {todos.map((todo: Todo) => (
             <li key={todo.id} className="flex justify-between items-center bg-gray-100 p-3 rounded-md shadow-sm">
               <span className={`${todo.completed ? 'line-through text-gray-500' : ''}`}>
                 {todo.title}

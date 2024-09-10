@@ -1,4 +1,4 @@
-import { ADD_TODO, EDIT_TODO, REMOVE_TODO, TOGGLE_TODO } from './todoAction';
+import { ADD_TODO, EDIT_TODO, REMOVE_TODO, TOGGLE_TODO } from './todoActions';
 import {
   Todo,
   TodoActionTypes,
@@ -6,8 +6,6 @@ import {
 
 interface TodoState {
   todos: Todo[];
-  // loading: boolean,
-  // error: string
 }
 
 const initialState: TodoState = {
@@ -28,8 +26,6 @@ const initialState: TodoState = {
       completed: false,
     }
   ],
-  // loading: false,
-  // error: ''
 };
 
 const todoReducer = (

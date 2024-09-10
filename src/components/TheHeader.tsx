@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import NavLinks from './NavLink';
 
 const TheHeader: React.FC = () => {
   return (
@@ -8,20 +8,7 @@ const TheHeader: React.FC = () => {
         <div className="flex items-center">
           <span className="text-white font-bold text-lg">My App</span>
         </div>
-        <nav className="flex space-x-4">
-          <Link
-            to="/"
-            className="text-white hover:text-gray-200 font-medium"
-          >
-            Users
-          </Link>
-          <Link
-            to="/todos"
-            className="text-white hover:text-gray-200 font-medium"
-          >
-            Todos
-          </Link>
-        </nav>
+        <NavLinks />
       </div>
     </header>
   );
