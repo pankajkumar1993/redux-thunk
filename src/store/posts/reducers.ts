@@ -5,7 +5,7 @@ import {
     UPDATE_POST_SUCCESS, UPDATE_POST_FAILURE,
     CLEAR_ERROR, CLEAR_SUCCESS,
     ADD_POST_REQUEST
-} from './postsAction';
+} from './actions';
 
 
 

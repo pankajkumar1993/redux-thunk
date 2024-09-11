@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useState, React, useDispatch, useSelector } from "../../utils/common-imports"
 import { AppDispatch } from '../../store';
 import { RootState } from '../../store/rootReducer';
-import { addPost, deletePost, updatePost } from '../../store/posts/postsAction';
+import { addPost, deletePost, updatePost } from '../../store/posts/actions';
 import { Post } from '../../store/posts/types';
 
 const PostComponent: React.FC = () => {
@@ -81,7 +80,7 @@ const PostComponent: React.FC = () => {
 
             {posts.length > 0 ? (
                 <ul className="space-y-4">
-                    {posts.map((post) => (
+                    {posts.map((post: Post) => (
                         <li key={post.id} className="flex justify-between items-center bg-gray-100 p-3 rounded-md shadow-sm">
                             <div>
                                 <h2 className="text-lg font-semibold">{post.title}</h2>

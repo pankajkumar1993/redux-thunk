@@ -1,9 +1,10 @@
-// // const BASE_PATH = process.env.REACT_APP_API_URL;
-// const BASE_PATH = 'https://dummyjson.com';
+// ********************* While Using Create React App *********************
+// const BASE_PATH = process.env.REACT_APP_API_URL;
 
-// console.log(BASE_PATH, "______");
+// ********************* While Using Vite *********************
+const BASE_PATH = import.meta.env.VITE_API_URL;
+console.log(BASE_PATH);
 
-
-// export {
-//     BASE_PATH
-// }
+export {
+    BASE_PATH
+}

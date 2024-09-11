@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useSelector } from "../../utils/common-imports"
 import { useAppDispatch } from "../../store";
-import { useSelector } from "react-redux";
 import { RootState } from "../../store/rootReducer";
 import { User } from "../../store/users/types";
 import { addUser, deleteUser, editUser, fetchUsers } from "../../utils/api";
-
 const UserComponent: React.FC = () => {
   const dispatch = useAppDispatch();
   const { users, loading, error } = useSelector((state: RootState) => state.users);
@@ -78,7 +76,7 @@ const UserComponent: React.FC = () => {
         </form>
       </div>
       <div className="grid grid-cols-3 gap-4">
-        {users?.sort((a, b) => b.id - a.id)?.map((user) => (
+        {users?.sort((a: any, b: any) => b.id - a.id)?.map((user: User) => (
           <div key={user.id} className="card flex flex-col gap-3">
             <div>
               <h2 className="text-lg font-semibold">{user.firstName} {user.lastName}</h2>

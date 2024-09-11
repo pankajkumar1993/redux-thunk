@@ -13,7 +13,7 @@ import {
     FETCH_USERS,
     FETCH_USERS_ERROR,
     FETCH_USERS_SUCCESS
-} from "./userActions";
+} from "./actions";
 
 // ************************* User Types *************************
 export interface User {

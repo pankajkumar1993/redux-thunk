@@ -1,7 +1,7 @@
 import { legacy_createStore as createStore, applyMiddleware, compose } from 'redux';
 import { thunk, ThunkMiddleware } from 'redux-thunk';
 import rootReducer, { RootState } from './rootReducer';
-import { useDispatch } from 'react-redux';
+import { useDispatch } from '../utils/common-imports';
 import storage from 'redux-persist/lib/storage';
 import { persistReducer, persistStore } from 'redux-persist';
 
@@ -44,7 +44,7 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 
 
-
+// ----------------------------------------------------------------------------------------------
 // import { legacy_createStore as createStore, applyMiddleware, compose } from 'redux';
 // import { thunk, ThunkMiddleware } from 'redux-thunk';
 // import rootReducer, { RootState } from './rootReducer';
@@ -65,12 +65,10 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 // export const useAppDispatch: () => AppDispatch = useDispatch as unknown as () => AppDispatch;
 
 // export default store;
+// ----------------------------------------------------------------------------------------------
 
 
-
-
-
-
+// ----------------------------------------------------------------------------------------------
 // import { legacy_createStore as createStore, applyMiddleware } from 'redux'
 // import { thunk, ThunkMiddleware } from 'redux-thunk';
 // import rootReducer, { RootState } from './reducers';
@@ -87,3 +85,4 @@ export const useAppDispatch = () => useDispatch<AppDispatch>();
 
 
 // export default store;
+// ----------------------------------------------------------------------------------------------

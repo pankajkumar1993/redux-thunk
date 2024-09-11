@@ -1,4 +1,4 @@
-import { ADD_TODO, EDIT_TODO, REMOVE_TODO, TOGGLE_TODO } from './todoActions';
+import { ADD_TODO, EDIT_TODO, REMOVE_TODO, TOGGLE_TODO } from './actions';
 import {
   TodoActionTypes,
   TodoState,

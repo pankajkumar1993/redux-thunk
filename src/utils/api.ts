@@ -13,17 +13,20 @@ import {
     FETCH_USER_ERROR,
     FETCH_USERS, FETCH_USERS_ERROR,
     FETCH_USERS_SUCCESS,
-} from "../store/users/userActions";
+} from "../store/users/actions";
 import { Dispatch } from "redux";
 import { User, UserActionTypes } from "../store/users/types";
 import { RootState } from "../store/rootReducer";
+import { BASE_PATH } from "../constants";
+console.log(BASE_PATH);
+
 
 // ************************ Thunk Fetch Action Creator ************************
 export const fetchUsers = () => async (dispatch: Dispatch<UserActionTypes>, getState: () => RootState) => {
     let a = getState().todos
-    let b = getState().users
+    // let b = getState().users
     console.log(a.todos[0]);
-    console.log(b.users[0]);
+    // console.log(b.users[0]);
 
     dispatch({ type: FETCH_USERS });
 
@@ -151,7 +154,7 @@ export const getUser = (userId: number) => async (dispatch: Dispatch<UserActionT
 
 
 
-
+// ----------------------------------------------------------------------------------------------
 // export const postRequest = (endpoint: string, body: any) => {
 //     const { dispatch } = store;
 

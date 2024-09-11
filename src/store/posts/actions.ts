@@ -64,7 +64,6 @@ export const updatePost = (post: Post) => async (dispatch: Dispatch) => {
   try {
     await new Promise((resolve) => setTimeout(resolve, 500));
     dispatch({ type: UPDATE_POST_SUCCESS, payload: post });
-
     setTimeout(() => {
       dispatch({ type: CLEAR_SUCCESS });
     }, time);
